@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -10,5 +10,21 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Server" Version="3.0.0-preview3-19153-02" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview3-19153-02" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Shared\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlazorEasierDebugging.Client\BlazorEasierDebugging.Client.csproj" />
+  </ItemGroup>
+
+  <Target Name="Custom" AfterTargets="Build;Rebuild">
+    <ItemGroup>
+      <ClientWwwFiles Include="..\BlazorEasierDebugging.Client\wwwroot\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ClientWwwFiles)" DestinationFolder="wwwroot\%(RecursiveDir)" />
+  </Target>
 
 </Project>

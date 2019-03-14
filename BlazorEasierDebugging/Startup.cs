@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,8 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BlazorEasierDebugging.Components;
-using BlazorEasierDebugging.Services;
 
 namespace BlazorEasierDebugging
 {
@@ -22,9 +21,14 @@ namespace BlazorEasierDebugging
             services.AddMvc()
                 .AddNewtonsoftJson();
 
-            services.AddRazorComponents();
+            services.AddHttpContextAccessor();
+            services.AddSingleton<HttpClient>(serviceProvider =>
+            {
+                var request = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext.Request;
+                return new HttpClient { BaseAddress = new Uri($"{request.Scheme}://{request.Host}") };
+            });
 
-            services.AddSingleton<WeatherForecastService>();
+            services.AddRazorComponents();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,7 +50,7 @@ namespace BlazorEasierDebugging
             app.UseRouting(routes =>
             {
                 routes.MapRazorPages();
-                routes.MapComponentHub<App>("app");
+                routes.MapComponentHub<Client.App>("app");
             });
         }
     }
